@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93c8f67b24bc2a24fabbe2f6b2e39b23, type: 3}
   m_Name: Room
   m_EditorClassIdentifier: 
-  roomName: 
-  description: 
+  roomName: Rooms
+  description: Salas room
   spawnProbability: 0
-  minSize: {x: 0, y: 0, z: 0}
-  maxSize: {x: 0, y: 0, z: 0}
-  allowedFloors: []
+  minSize: {x: 5, y: 5, z: 3}
+  maxSize: {x: 15, y: 15, z: 15}
+  allowedFloors:
+  - {fileID: 11400000, guid: 2788a6547ead84842a296cb9af7ada92, type: 2}

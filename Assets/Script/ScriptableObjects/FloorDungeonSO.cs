@@ -6,7 +6,7 @@ public class FloorDungeonSO : ScriptableObject {
     [TextArea] public string description;
     public float spawnProbability;
     public Vector3Int minSize, maxSize;
-    public DungeonSo[] allowedDungeonTypes;
+    public DungeonSO[] allowedDungeonTypes;
 }
 
 

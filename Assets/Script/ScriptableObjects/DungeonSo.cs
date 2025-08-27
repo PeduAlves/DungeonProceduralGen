@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "DungeonSo", menuName = "Dungeon/TypeDungeon")]
-public class DungeonSo : ScriptableObject {
+public class DungeonSO : ScriptableObject {
     public string dungeonName;
     [TextArea] public string description;
     public float spawnProbability;

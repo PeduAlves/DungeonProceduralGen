@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dungeonName: Castle
   description: Dungeon baseada em castelos
-  spawnProbability: 0.4
-  minFloors: 0
-  maxFloors: 0
+  spawnProbability: 1
+  minFloors: 1
+  maxFloors: 5

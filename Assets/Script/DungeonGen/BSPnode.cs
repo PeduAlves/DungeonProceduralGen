@@ -1,47 +1,52 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class BSPNode : MonoBehaviour
+// REMOVIDO: MonoBehaviour (BSPNode é estrutura de dados, não precisa ser component)
+public class BSPNode
 {
     public RectInt bounds;
     public BSPNode left = null;
     public BSPNode right = null;
     public RectInt? room = null;
 
-    public int leafChance = 10;
-
+    // Configurações estáticas
     private static int minAreaSize = 10;
 
-    public BSPNode(RectInt bounds){
-
+    public BSPNode(RectInt bounds)
+    {
         this.bounds = bounds;
     }
 
-    public bool IsLeaf(){
-
-        if (Random.Range(0, leafChance) == 10) return true;
-
+    public bool IsLeaf()
+    {
         return left == null && right == null;
     }
     
-     public bool Split(){
-
+    // CORRIGIDO: Agora recebe System.Random para determinismo
+    public bool Split(System.Random rng, int leafChance = 10)
+    {
         // Se já foi dividido, não divide de novo
         if (!IsLeaf()) return false;
 
-        bool splitHorizontally = Random.value > 0.5f;
+        // CORRIGIDO: Chance de parar dividindo (implementação correta)
+        if (rng.Next(0, 100) < leafChance) return false;
 
-        if (bounds.width > bounds.height && bounds.width / bounds.height >= 1.25f)
+        // CORRIGIDO: Usar rng ao invés de Random.value
+        bool splitHorizontally = rng.NextDouble() > 0.5;
+
+        // Lógica para evitar salas muito alongadas
+        if (bounds.width > bounds.height && bounds.width / (float)bounds.height >= 1.25f)
             splitHorizontally = false;
-        else if (bounds.height > bounds.width && bounds.height / bounds.width >= 1.25f)
+        else if (bounds.height > bounds.width && bounds.height / (float)bounds.width >= 1.25f)
             splitHorizontally = true;
 
         int max = splitHorizontally ? bounds.height : bounds.width;
 
         if (max < minAreaSize * 2)
-            return false; // muito pequeno para dividir
+            return false; // Muito pequeno para dividir
 
-        int split = Random.Range(minAreaSize, max - minAreaSize);
+        // CORRIGIDO: Usar rng.Next ao invés de Random.Range
+        int split = rng.Next(minAreaSize, max - minAreaSize);
 
         if (splitHorizontally)
         {
@@ -61,22 +66,24 @@ public class BSPNode : MonoBehaviour
         return true;
     }
     
-     public void CreateRoom(){
-        
+    // CORRIGIDO: Agora recebe System.Random
+    public void CreateRoom(System.Random rng)
+    {
         if (!IsLeaf()) return;
 
-        int roomWidth = Random.Range(bounds.width / 2, bounds.width - 1);
-        int roomHeight = Random.Range(bounds.height / 2, bounds.height - 1);
+        // CORRIGIDO: Usar rng.Next ao invés de Random.Range
+        int roomWidth = rng.Next(bounds.width / 2, bounds.width - 1);
+        int roomHeight = rng.Next(bounds.height / 2, bounds.height - 1);
 
-        int roomX = bounds.x + Random.Range(0, bounds.width - roomWidth);
-        int roomY = bounds.y + Random.Range(0, bounds.height - roomHeight);
+        int roomX = bounds.x + rng.Next(0, bounds.width - roomWidth);
+        int roomY = bounds.y + rng.Next(0, bounds.height - roomHeight);
 
         room = new RectInt(roomX, roomY, roomWidth, roomHeight);
     }
 
-    // Retorna todas as folhas da árvore (útil para gerar salas)
-    public List<BSPNode> GetLeaves(){
-
+    // Retorna todas as folhas da árvore
+    public List<BSPNode> GetLeaves()
+    {
         List<BSPNode> leaves = new List<BSPNode>();
         if (IsLeaf())
             leaves.Add(this);

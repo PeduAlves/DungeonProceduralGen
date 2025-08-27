@@ -426,7 +426,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1375650277
+--- !u!1 &1004895639
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -434,57 +434,101 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 1375650280}
-  - component: {fileID: 1375650279}
-  - component: {fileID: 1375650278}
+  - component: {fileID: 1004895641}
+  - component: {fileID: 1004895640}
   m_Layer: 0
-  m_Name: BspDunGen
+  m_Name: Dung Initializer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1375650278
+--- !u!114 &1004895640
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1375650277}
+  m_GameObject: {fileID: 1004895639}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e3b09cb13d54f4498f7167c3b05ed3b, type: 3}
+  m_Script: {fileID: 11500000, guid: 033222b89a7844f418636e3213911eb9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generator: {fileID: 1375650279}
---- !u!114 &1375650279
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1375650277}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ffc77c82742de7347be01a8df376020e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  generate: 1
-  dungeonSize: {x: 64, y: 64}
-  maxIterations: 3
-  minRoomSize: 6
-  rootNode: {fileID: 0}
-  leaves: []
---- !u!4 &1375650280
+  generateDungeon: 1
+  seed: 0
+  logGeneration: 1
+  currentDungeon:
+    dungeonType: {fileID: 0}
+    floors: []
+    seed: 0
+    totalSize: {x: 0, y: 0, z: 0}
+  availableDungeonTypes:
+  - {fileID: 11400000, guid: 8b69e8067c6cef94c879d407b5f0bf1e, type: 2}
+  availableFloorTypes:
+  - {fileID: 11400000, guid: 2788a6547ead84842a296cb9af7ada92, type: 2}
+  availableRoomTypes:
+  - {fileID: 11400000, guid: a89fc7173152f714a99ba55d69ec436b, type: 2}
+--- !u!4 &1004895641
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1375650277}
+  m_GameObject: {fileID: 1004895639}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1548056931
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1548056933}
+  - component: {fileID: 1548056932}
+  m_Layer: 0
+  m_Name: Dung Visualizer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1548056932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548056931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19744ad97c9952e488eee48151673a97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dungeonInitializer: {fileID: 1004895640}
+  drawFloors: 1
+  drawRooms: 1
+  dungeonColor: {r: 1, g: 1, b: 1, a: 1}
+  floorColor: {r: 0, g: 1, b: 0, a: 1}
+  roomColor: {r: 0, g: 1, b: 1, a: 1}
+--- !u!4 &1548056933
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1548056931}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -497,4 +541,5 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 1375650280}
+  - {fileID: 1004895641}
+  - {fileID: 1548056933}

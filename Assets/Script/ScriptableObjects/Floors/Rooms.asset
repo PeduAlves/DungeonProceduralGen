@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 410cb14a19c91b347825a6147b30470e, type: 3}
   m_Name: Rooms
   m_EditorClassIdentifier: 
-  floorName: 
+  floorName: RoomsFloor
   description: 
-  spawnProbability: 0
-  minSize: {x: 0, y: 0, z: 0}
-  maxSize: {x: 0, y: 0, z: 0}
-  allowedDungeonTypes: []
+  spawnProbability: 1
+  minSize: {x: 10, y: 10, z: 10}
+  maxSize: {x: 50, y: 50, z: 20}
+  allowedDungeonTypes:
+  - {fileID: 11400000, guid: 8b69e8067c6cef94c879d407b5f0bf1e, type: 2}
