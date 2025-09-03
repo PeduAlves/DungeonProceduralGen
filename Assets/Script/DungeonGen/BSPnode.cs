@@ -1,19 +1,16 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// REMOVIDO: MonoBehaviour (BSPNode é estrutura de dados, não precisa ser component)
 public class BSPNode
 {
     public RectInt bounds;
     public BSPNode left = null;
     public BSPNode right = null;
     public RectInt? room = null;
-
     // Configurações estáticas
     private static int minAreaSize = 10;
-
-    public BSPNode(RectInt bounds)
-    {
+    
+    public BSPNode(RectInt bounds) {
         this.bounds = bounds;
     }
 

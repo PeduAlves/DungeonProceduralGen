@@ -6,16 +6,15 @@ public class DungeonInitializer : MonoBehaviour
 {
     [Header("Generation Settings")]
     public bool generateDungeon;
-    public int seed = 0; // 0 = random seed
+    public int seed = 0;
 
     [Header("Debug")]
     public bool logGeneration = true;
-    
-    // Dados gerados
-    [HideInInspector] public DungeonInstance currentDungeon;
-    private System.Random rng;
 
-    // TODO: Carregar estes SOs de Resources ou assignar no Inspector
+    [HideInInspector] public DungeonInstance currentDungeon;
+    [HideInInspector] public System.Random rng;
+    public BSPNode bsp;
+
     [Header("Available SOs - Assign manually for now")]
     public DungeonSO[] availableDungeonTypes;
     public FloorDungeonSO[] availableFloorTypes; 
@@ -32,30 +31,25 @@ public class DungeonInitializer : MonoBehaviour
 
     public void DungeonInit() 
     {
-        print("=== STARTING DUNGEON GENERATION ===");
-        
-        // PASSO 1: Setup da seed
+        LogStep("=== STARTING DUNGEON GENERATION ===");
+ 
         SetupSeed();
         
-        // PASSO 2: Escolher tipo da dungeon
         DungeonSO chosenDungeonType = ChooseDungeonType();
-        if (chosenDungeonType == null) 
-        {
+        
+        if (chosenDungeonType == null) {
             Debug.LogError("No dungeon types available!");
             return;
         }
         
-        // PASSO 3: Criar instância da dungeon
         currentDungeon = new DungeonInstance(chosenDungeonType, seed);
-        print($"Created dungeon: {chosenDungeonType.dungeonName}");
-        
-        // PASSO 4: Gerar andares
+
+        LogStep($"Created dungeon: {chosenDungeonType.dungeonName}");
+
         GenerateFloors();
-        
-        // PASSO 5: Gerar layout de cada andar
         GenerateFloorLayouts();
         
-        print("=== DUNGEON GENERATION COMPLETE ===");
+        LogStep("=== DUNGEON GENERATION COMPLETE ===");
         LogDungeonSummary();
     }
 
@@ -66,7 +60,7 @@ public class DungeonInitializer : MonoBehaviour
             seed = Environment.TickCount;
         }
         rng = new System.Random(seed);
-        print($"Using seed: {seed}");
+        LogStep($"Using seed: {seed}");
     }
 
     private DungeonSO ChooseDungeonType()
@@ -86,12 +80,10 @@ public class DungeonInitializer : MonoBehaviour
     private void GenerateFloors()
     {
         var dungeonType = currentDungeon.dungeonType;
-        
-        // PASSO 3: Decidir número de andares
         int numFloors = rng.Next(dungeonType.minFloors, dungeonType.maxFloors + 1);
-        print($"Generating {numFloors} floors (range: {dungeonType.minFloors}-{dungeonType.maxFloors})");
+
+        LogStep($"Generating {numFloors} floors (range: {dungeonType.minFloors}-{dungeonType.maxFloors})");
         
-        // PASSO 4: Escolher tipo de cada andar
         for (int i = 0; i < numFloors; i++)
         {
             FloorDungeonSO floorType = ChooseFloorType(dungeonType);
@@ -99,16 +91,16 @@ public class DungeonInitializer : MonoBehaviour
             {
                 var floorInstance = new FloorInstance(floorType, i);
                 
-                // Posição vertical do andar (espaçamento de 4 unidades entre andares)
                 floorInstance.position = new Vector3Int(0, -i * 4, 0);
                 floorInstance.size = new Vector3Int(
                     rng.Next(floorType.minSize.x, floorType.maxSize.x + 1),
-                    4, // Altura fixa
+                    rng.Next(floorType.minSize.y, floorType.maxSize.y + 1),
                     rng.Next(floorType.minSize.z, floorType.maxSize.z + 1)
                 );
                 
                 currentDungeon.floors.Add(floorInstance);
-                print($"Floor {i}: {floorType.floorName} (size: {floorInstance.size})");
+
+                LogStep($"Floor {i}: {floorType.floorName} (size: {floorInstance.size})");
             }
         }
     }
@@ -118,14 +110,13 @@ public class DungeonInitializer : MonoBehaviour
         // TODO: Usar BuildListWithQuotas quando implementar
         // Por enquanto: escolha aleatória dos floors permitidos
         
-        if (availableFloorTypes == null || availableFloorTypes.Length == 0)
-            return null;
+        if (availableFloorTypes == null || availableFloorTypes.Length == 0) return null;
             
         var validFloors = new List<FloorDungeonSO>();
         
         foreach (var floor in availableFloorTypes)
         {
-            // Verificar se este floor pode aparecer nesta dungeon
+
             if (IsFloorAllowedInDungeon(floor, dungeonType))
             {
                 validFloors.Add(floor);
@@ -134,7 +125,8 @@ public class DungeonInitializer : MonoBehaviour
         
         if (validFloors.Count == 0)
         {
-            print("Warning: No valid floors found, using first available floor");
+            LogStep("Warning: No valid floors found, using first available floor");
+
             return availableFloorTypes[0];
         }
         
@@ -144,7 +136,7 @@ public class DungeonInitializer : MonoBehaviour
     private bool IsFloorAllowedInDungeon(FloorDungeonSO floor, DungeonSO dungeon)
     {
         if (floor.allowedDungeonTypes == null || floor.allowedDungeonTypes.Length == 0)
-            return true; // Se não especificado, permite em qualquer dungeon
+            return true;
             
         foreach (var allowedDungeon in floor.allowedDungeonTypes)
         {
@@ -157,76 +149,66 @@ public class DungeonInitializer : MonoBehaviour
 
     private void GenerateFloorLayouts()
     {
-        for (int i = 0; i < currentDungeon.floors.Count; i++)
-        {
+        for (int i = 0; i < currentDungeon.floors.Count; i++) {
             var floor = currentDungeon.floors[i];
-            print($"Generating layout for floor {i}: {floor.floorType.floorName}");
-            
-            // Por enquanto: gerar BSP simples para todos os andares
-            GenerateBSPLayout(floor);
+            LogStep($"Generating layout for floor {i}: {floor.floorType.floorName}");
+
+            GenerateBSPLayout(floor);//TODO Alterar para funcao de escolha de algoritmo
         }
     }
-
-    private void GenerateBSPLayout(FloorInstance floor)
-    {
+    
+    private void GenerateBSPLayout(FloorInstance floor) {
         // Usar seed derivada para este andar
         var floorRng = new System.Random(rng.Next());
-        
+
         // Criar área inicial baseada no tamanho do andar
         RectInt floorArea = new RectInt(0, 0, floor.size.x, floor.size.z);
-        
+
         // Criar BSP
         floor.bspRoot = new BSPNode(floorArea);
         floor.layoutType = FloorLayoutType.BSP;
-        
+
         // Dividir BSP (máximo 4 iterações para ter poucas salas)
         var leaves = new List<BSPNode> { floor.bspRoot };
-        
-        for (int iteration = 0; iteration < 4; iteration++)
-        {
+
+        for (int iteration = 0; iteration < 4; iteration++) {
             var newLeaves = new List<BSPNode>();
-            
-            foreach (var leaf in leaves)
-            {
+
+            foreach (var leaf in leaves) {
                 if (leaf.Split(floorRng, leafChance: 30)) // 30% chance de parar
                 {
                     newLeaves.Add(leaf.left);
                     newLeaves.Add(leaf.right);
                 }
-                else
-                {
+                else {
                     newLeaves.Add(leaf);
                 }
             }
-            
+
             leaves = newLeaves;
         }
-        
+
         // Criar salas nas folhas
-        foreach (var leaf in leaves)
-        {
+        foreach (var leaf in leaves) {
             leaf.CreateRoom(floorRng);
-            
-            if (leaf.room.HasValue)
-            {
+
+            if (leaf.room.HasValue) {
                 // TODO: Escolher tipo de sala baseado nas RoomEntries do FloorSO
                 // Por enquanto: usar primeira sala disponível
                 RoomDungeonSO roomType = availableRoomTypes?[0];
-                
+
                 var roomInstance = new RoomInstance(roomType, leaf.room.Value);
                 roomInstance.roomId = floor.rooms.Count;
-                
+
                 floor.rooms.Add(roomInstance);
             }
         }
-        
-        print($"Floor {floor.floorIndex}: Generated {floor.rooms.Count} rooms using BSP");
+
+        LogStep($"Floor {floor.floorIndex}: Generated {floor.rooms.Count} rooms using BSP");
     }
 
-    private void print(string message)
-    {
-        if (logGeneration)
-        {
+    public void LogStep(string message) {
+        if (logGeneration) {
             Debug.Log($"[DungeonGen] {message}");
         }
     }
@@ -235,12 +217,12 @@ public class DungeonInitializer : MonoBehaviour
     {
         if (currentDungeon == null) return;
         
-        print($"SUMMARY - Seed: {currentDungeon.seed}, Type: {currentDungeon.dungeonType.dungeonName}");
+        LogStep($"SUMMARY - Seed: {currentDungeon.seed}, Type: {currentDungeon.dungeonType.dungeonName}");
         
         for (int i = 0; i < currentDungeon.floors.Count; i++)
         {
             var floor = currentDungeon.floors[i];
-            print($"  Floor {i}: {floor.floorType.floorName} - {floor.rooms.Count} rooms");
+            LogStep($"  Floor {i}: {floor.floorType.floorName} - {floor.rooms.Count} rooms");
         }
     }
 }
